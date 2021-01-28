@@ -4,7 +4,6 @@ export const REGISTER_PAGE ='/register';
 export const ADMIN_PAGE = '/add';
 export const ABOUT_PAGE = '/about/';
 export const VIEW_ITEMS_PAGE = '/items';
-export const VIEW_ADMIN_ITEMS_PAGE = '/approve';
 export const EDIT_ITEM_PAGE = '/edit/';
 export const VIEW_ITEM_PAGE = '/view/';
 export const VIEW_AUTHORS_PAGE = '/authors';

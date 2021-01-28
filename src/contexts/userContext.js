@@ -1,6 +1,5 @@
-import React, { useState, createContext, useMemo } from 'react';
+import React, { useState, createContext } from 'react';
 import { validateApi } from '../api/services/validateTokenApi';
-import { getSessionCookie } from '../config/session';
 
 export const UserContext = createContext();
 

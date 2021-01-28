@@ -73,17 +73,19 @@ const useStyles = makeStyles(theme => ({
 
 // Rendering individual images
 const Image = ({ image, item, setUpdated }) => {
-    const [session] = React.useContext(UserContext);
     const classes = useStyles(makeStyles);
     const [uploadInitialized, setUploadInitialized] = React.useState(false);
-    const [error, setError] = React.useState(false);
+    const [, setError] = React.useState(false);
 
     React.useEffect(async () => {
-       if(image.uploading && !uploadInitialized) {
-            setUploadInitialized(true);
-            const response = await uploadImage(image);
-            setUpdated({index: image.index, src: response.url, publicId: response.publicId, uploading: false, uploaded: true});
+        async function fetchData() {
+            if(image.uploading && !uploadInitialized) {
+                setUploadInitialized(true);
+                const response = await uploadImage(image);
+                setUpdated({index: image.index, src: response.url, publicId: response.publicId, uploading: false, uploaded: true});
+            }
         }
+        fetchData();
     },[image.uploading]);
 
     const uploadImage = async (image) => {

@@ -3,15 +3,10 @@ import React from 'react';
 import { ABOUT_PAGE } from '../../config/routes';
 // context
 import { UserContext } from '../../contexts/userContext';
-// API
-import { loginApi } from '../../api/services/loginApi';
-//components
-import LoginForm from '../../components/Forms/LoginForm/LoginForm';
 import { makeStyles } from '@material-ui/core';
 import { red } from '@material-ui/core/colors';
 import { bgColor } from '../../styles/colors';
 import { validateApi } from '../../api/services/validateTokenApi';
-import { oauthLoginApi } from '../../api/services/oauthLoginApi';
 import ChangePasswordForm from '../../components/Forms/LoginForm/ChangePasswordForm';
 import { changePasswordApi } from '../../api/services/changePasswordApi';
 

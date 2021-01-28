@@ -63,7 +63,7 @@ export default function BanUserDialog({data, onConfirm, disabled}) {
   };
   
   const handleConfirm = async () => {
-    const dataSent = await onConfirm(data);
+    await onConfirm(data);
     handleClose();
   };
   return (

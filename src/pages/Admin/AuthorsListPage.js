@@ -3,8 +3,6 @@ import { UserContext } from '../../contexts/userContext';
 import { Redirect } from 'react-router-dom';
 import { LOGIN_PAGE } from '../../config/routes';
 import AuthorsListView from '../../components/Admin/AuthorsListView';
-import { getAuthorsApi } from '../../api/services/getAuthorsApi';
-import { AuthorsListContext } from '../../contexts/authorsListContext';
 
 const AuthorsListPage = () => {
 

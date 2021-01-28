@@ -4,7 +4,7 @@ import React from 'react';
 import FormLayout from '../FormLayout/FormLayout';
 import TextInput from '../InputFields/TextInput';
 import StyledButton from '../../common/StyledButton';
-import { makeStyles, Divider, Button } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import { textsRed, mainGreen } from '../../../styles/colors';
 
 const useStyles = makeStyles((theme) => ({
@@ -93,16 +93,10 @@ const ChangePasswordForm = ({onSubmit, isLoading, error}) => {
     const classes = useStyles(makeStyles);
     // Credentials data
      // User session
-    const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [newPassword, setNewPassword] = React.useState("");
     const [rePassword, setRePassword] = React.useState("");
     
-    // set username
-    const onChangeUsername = (value, error) => {
-        setEmail(value);
-    }
-
     // set password
      const onChangeOldPassword = (value, error) => {
         setPassword(value);

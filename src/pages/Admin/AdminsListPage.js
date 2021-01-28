@@ -3,8 +3,6 @@ import { UserContext } from '../../contexts/userContext';
 import { Redirect } from 'react-router-dom';
 import { LOGIN_PAGE } from '../../config/routes';
 import AdminsListView from '../../components/Admin/AdminsListView';
-import { getAdminsApi } from '../../api/services/getAdminsApi';
-import { AdminsListContext } from '../../contexts/adminsListContext';
 
 const AdminsListPage = () => {
 

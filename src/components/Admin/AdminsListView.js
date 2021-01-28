@@ -7,7 +7,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { Checkbox, TablePagination, TableSortLabel, Toolbar, Typography } from '@material-ui/core';
+import { TablePagination, TableSortLabel, Toolbar, Typography } from '@material-ui/core';
 import Loader from '../common/Loader';
 import { UserContext } from '../../contexts/userContext';
 import { bgColor } from '../../styles/colors';
@@ -86,7 +86,6 @@ popper: {
 export default function BasicTable() {
 
     const [user] = React.useContext(UserContext);
-    const [, setAuthors] = React.useContext(AuthorsListContext);
     const [admins, setAdmins] = React.useContext(AdminsListContext);
     
     const classes = useStyles();
@@ -96,8 +95,8 @@ export default function BasicTable() {
     const [orderBy, setOrderBy] = React.useState("date");
     const [order, setOrder] = React.useState("asc");
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(7);
-    const [dialogOpen, setIsDialogOpen] = React.useState(false); 
+    const [rowsPerPage,] = React.useState(7);
+    const [, setIsDialogOpen] = React.useState(false); 
     const [totalItems, setTotalItems] = React.useState(0);
 
     const openConfirmDialog = () => {
@@ -125,14 +124,6 @@ export default function BasicTable() {
       return;
     }
   }
-
-  React.useEffect( () => {
-    getPageData(false);
-  },[page, admins]);
-
-  React.useEffect( () => {
-    getPageData(true);
-  },[orderBy, order]);
 
   const getPageData = async () => {
     let response;
@@ -175,6 +166,16 @@ export default function BasicTable() {
       setTotalItems(result[0].totalElements);
     };
   } 
+
+  React.useEffect( () => {
+    const fetchData = getPageData;
+    fetchData(false);
+  },[page, admins, getPageData]);
+
+  React.useEffect( () => {
+    const fetchData = getPageData;
+    fetchData(true);
+  },[orderBy, order]);
 
   const isAdmin = () => {
     return user.user.roles.some(role => role === "SUPER_ADMIN")
@@ -240,8 +241,7 @@ export default function BasicTable() {
             className={classes.table} 
             aria-label="simple table"
             aria-labelledby="tableTitle"
-            size='medium'
-            aria-label="enhanced table">
+            size='medium'>
           <TableHead>
             <TableRow>
               <TableCell  align="left"  style={{width: "20px", fontWeight: "bold", overflow: "hidden"}}>

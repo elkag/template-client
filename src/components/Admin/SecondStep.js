@@ -1,9 +1,9 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 // context
 import { UserContext } from '../../contexts/userContext';
 //components
 
-import { Button, Chip, Container, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Button, Chip, makeStyles, TextField } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     wrapper: {
@@ -51,10 +51,6 @@ const SecondStep = ({
     categoriesString, onChangeCategories,
     handleComplete,
     allDisabled}) => {
-  
-    const [session] = React.useContext(UserContext);
-    const [item, setItem] = React.useState(null);
-    const [error, setError] = React.useState('');
     
     const classes = useStyles(makeStyles);
 
@@ -62,10 +58,6 @@ const SecondStep = ({
         
     });
 
-    const handleError = (error) => {
-        setError({ error });
-    }
-    
     const applyCategories = () => {
         const localCategories = categoriesString.split(",").map(value => value.trim());
         handleComplete(checkComplete({categories: localCategories, tags: tags}));

@@ -7,16 +7,12 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { Checkbox, TablePagination, TableSortLabel, Toolbar, Typography } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import { TablePagination, TableSortLabel, Toolbar, Typography } from '@material-ui/core';
 import Loader from '../common/Loader';
 import { UserContext } from '../../contexts/userContext';
 import { bgColor } from '../../styles/colors';
-import { deleteItemApi } from '../../api/services/deleteItemApi';
 import { AuthorsListContext } from '../../contexts/authorsListContext';
-import { AdminsListContext } from '../../contexts/adminsListContext';
 import BanUserDialog from './dialogues/BanUserDialog';
-import PromoteToAdminDialog from './dialogues/PromoteToAdminDialog';
 import { promoteUsersApi } from '../../api/services/promoteUsersApi';
 import { getAuthorsApi } from '../../api/services/getAuthorsApi';
 import { banUserApi } from '../../api/services/banUserApi';
@@ -88,10 +84,8 @@ popper: {
 
 export default function BasicTable() {
 
-    const history = useHistory();
     const [user] = React.useContext(UserContext);
     const [authors, setAuthors] = React.useContext(AuthorsListContext);
-    const [, setAdmins] = React.useContext(AdminsListContext);
     
     const classes = useStyles();
 
@@ -100,9 +94,8 @@ export default function BasicTable() {
     const [orderBy, setOrderBy] = React.useState("date");
     const [order, setOrder] = React.useState("asc");
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(7);
-    const [dialogOpen, setIsDialogOpen] = React.useState(false); 
-    const [adminCandidates, setAdminCandidates] = React.useState([]);
+    const [rowsPerPage] = React.useState(7);
+    const [, setIsDialogOpen] = React.useState(false); 
     const [totalItems, setTotalItems] = React.useState(0);
 
     const openConfirmDialog = () => {
@@ -131,14 +124,6 @@ export default function BasicTable() {
       return;
     }
   }
-
-  React.useEffect( () => {
-    getPageData(false);
-  },[page, authors]);
-
-  React.useEffect( () => {
-    getPageData(true);
-  },[orderBy, order]);
 
   const getPageData = async () => {
     let response;
@@ -181,6 +166,17 @@ export default function BasicTable() {
       setTotalItems(result[0].totalElements);
     };
   } 
+
+  
+  React.useEffect( () => {
+    const fetchData = getPageData;
+    fetchData(false);
+  },[page, authors]);
+
+  React.useEffect( () => {
+    const fetchData = getPageData;
+    fetchData(false);
+  },[orderBy, order]);
 
   const isAdmin = () => {
     return user.user.roles.some(role => role === "SUPER_ADMIN")
@@ -244,7 +240,6 @@ export default function BasicTable() {
       <TableContainer component={Paper} className={classes.paper}>
         <Table 
             className={classes.table} 
-            aria-label="simple table"
             aria-labelledby="tableTitle"
             size='medium'
             aria-label="enhanced table">

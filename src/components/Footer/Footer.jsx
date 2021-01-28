@@ -29,10 +29,8 @@ const openApiDocs = async (event) => {
 }
 const Footer = () => {
 
-    const history = useHistory();
-
     const classes = useStyles();
-    const [session, setSession] = useContext(UserContext);
+    const [session] = useContext(UserContext);
    
     return (
         <div className={classes.footer}>

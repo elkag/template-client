@@ -1,6 +1,4 @@
-import React, { useCallback, useState } from 'react';
-// context
-import { UserContext } from '../../contexts/userContext';
+import React, { useCallback } from 'react';
 //components
 
 import { makeStyles } from '@material-ui/core';
@@ -16,12 +14,8 @@ const useStyles = makeStyles( theme => ({
 }));
 
 const ThirdStep = ({images, setImages, setUpdated, item, allDisabled}) => {
-  
-    const [session] = React.useContext(UserContext);
-    const [error, setError] = React.useState('');
     
     const classes = useStyles(makeStyles);
-
 
     const onDrop = useCallback(acceptedFiles => {
         // Loop through accepted files
@@ -47,17 +41,8 @@ const ThirdStep = ({images, setImages, setUpdated, item, allDisabled}) => {
             reader.readAsDataURL(file);
             return file;
             });
-    }, []);
+    }, [setImages]);
 
-    const handleError = (error) => {
-        setError({ error });
-    }
-
-    const successCallBack = () => {
-    }
-    const failureCallBack = () => {
-    }
-    
     return (
         <div  className={classes.wrapper}>
             <div className={classes.dropzone}>

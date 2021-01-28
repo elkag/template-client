@@ -5,10 +5,10 @@ import FormLayout from '../FormLayout/FormLayout';
 import TextInput from '../InputFields/TextInput';
 import StyledButton from '../../common/StyledButton';
 import FacebookButton from '../../common/FacebookButton';
-import { makeStyles, Divider, Button } from '@material-ui/core';
+import { makeStyles, Divider } from '@material-ui/core';
 import { textsRed, mainGreen } from '../../../styles/colors';
 import { REGISTER_PAGE } from '../../../config/routes';
-import { FacebookProvider, LoginButton, Like, Profile } from 'react-facebook';
+import { FacebookProvider, LoginButton } from 'react-facebook';
 import googleLogo from '../../../resources/img/google-logo.png';
 import GoogleButton from '../../common/GoogleButton';
 

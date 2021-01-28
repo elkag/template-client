@@ -8,8 +8,6 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import { ArrowDownward, ArrowUpward } from '@material-ui/icons';
 import { Tooltip } from '@material-ui/core';
 
@@ -64,7 +62,7 @@ export default function PromoteUserDialog({data, onConfirm, disabled}) {
   };
   
   const handleConfirm = async () => {
-    const dataSent = await onConfirm(data);
+    await onConfirm(data);
     handleClose();
   };
   return (

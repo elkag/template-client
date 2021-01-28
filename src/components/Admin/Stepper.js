@@ -67,10 +67,10 @@ export default function HorizontalNonLinearStepper() {
     const [tags, setTags] = React.useState([]);
     const [categories, setCategories] = React.useState([]);
     const [images, setImages] = React.useState([]);
-    const [uploading, setUploading] = React.useState(false);
+    const [, setUploading] = React.useState(false);
     const [updated, setUpdated] = React.useState(false);
     const [itemId, setItemId] = React.useState(null);
-    const [uploadButtonDisabled, setUploadButtonDisabled] = React.useState(false);
+    const [, setUploadButtonDisabled] = React.useState(false);
 
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState("");
@@ -79,60 +79,67 @@ export default function HorizontalNonLinearStepper() {
     const steps = getSteps();
 
     const getItem = React.useCallback(async () => {
-        setError("");
-        setLoading(true);
-        const response = await getItemApi.get(params.item);
-        setLoading(false);
-        if(response.errors || response.error){
-            setError(response.message);
-        } else { 
-            setItemId(response.id);
-            setTitle(response.name);
-            setDescription(response.description);
-            setLink(response.link);
-            setText(response.notes);
-            setCategories(response.categories);
-            setTags(response.tags); 
-            setCategoriesString(response.categories.join(", "));
-            setTagsString(response.tags.join(", ")); 
-            response.images = response.images.map(img => {return {id: img.id, src: img.url, publicId: img.publicId, uploaded: true, uploading: false}})
-            setImages(response.images);
-            for(let i=0; i <= 2; i++){
-                const newCompleted = completed;
-                newCompleted[i] = true;
-                setCompleted(newCompleted);
+        async function fetchItem() {}
+            setError("");
+            setLoading(true);
+            const response = await getItemApi.get(params.item);
+            setLoading(false);
+            if(response.errors || response.error){
+                setError(response.message);
+            } else { 
+                setItemId(response.id);
+                setTitle(response.name);
+                setDescription(response.description);
+                setLink(response.link);
+                setText(response.notes);
+                setCategories(response.categories);
+                setTags(response.tags); 
+                setCategoriesString(response.categories.join(", "));
+                setTagsString(response.tags.join(", ")); 
+                response.images = response.images.map(img => {return {id: img.id, src: img.url, publicId: img.publicId, uploaded: true, uploading: false}})
+                setImages(response.images);
+                for(let i=0; i <= 2; i++){
+                    const newCompleted = completed;
+                    newCompleted[i] = true;
+                    setCompleted(newCompleted);
+                }
+                setData(response);
             }
-             setData(response);
-        }
-       
+            fetchItem();
       }, [params.item])
     
       React.useEffect( () => {
-          if(params.item){
+          const getItm = () => {
+            if(params.item){
               getItem();
+            }
           }
+          getItm();
         
       },[getItem])
 
     React.useEffect(() => {
-        const imagesCopy = ([...images].map(object => {
-            if(object.index === updated.index) {
-                return {
-                    ...object,
-                    src: updated.src,
-                    publicId: updated.publicId,
-                    uploading: updated.uploading,
-                    uploaded: updated.uploaded
+        const fetchAfterUpload = () => {
+            const imagesCopy = ([...images].map(object => {
+                if(object.index === updated.index) {
+                    return {
+                        ...object,
+                        src: updated.src,
+                        publicId: updated.publicId,
+                        uploading: updated.uploading,
+                        uploaded: updated.uploaded
+                    }
                 }
+                else return object;                 
+            }));
+            const notUploaded = [...imagesCopy].filter(img => img.uploaded !== true);
+            if(imagesCopy.length > 0 && notUploaded.length === 0) {
+                handleComplete(true);
             }
-            else return object;                 
-        }));
-        const notUploaded = [...imagesCopy].filter(img => img.uploaded !== true);
-        if(imagesCopy.length > 0 && notUploaded.length === 0) {
-            handleComplete(true);
+            setUploadButtonDisabled(handleUploadDisabled());
+            setImages(imagesCopy);
         }
-        setUploadButtonDisabled(handleUploadDisabled());
-        setImages(imagesCopy);
+        fetchAfterUpload();
     },[updated]);
 
     const  getStepContent = (step) => {
@@ -282,13 +289,6 @@ export default function HorizontalNonLinearStepper() {
         setImages(imagesCopy);
     }
     
-    const allUploaded = () => {
-        const notUploaded = [...images].filter(img => img.uploaded !== true);
-        if(images.length > 0 && notUploaded.length === 0) {
-            return true;
-        }
-        return false;
-    }
     return (
         <div className={classes.root}>
         <Loader loading={loading} error={error} />

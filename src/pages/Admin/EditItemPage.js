@@ -40,13 +40,8 @@ const useStyles = makeStyles(theme => ({
 const EditItemView = ({item, page}) => {
   
     const [session] = React.useContext(UserContext);
-    const [error, setError] = React.useState('');
     
     const classes = useStyles(makeStyles);
-
-    const handleError = (error) => {
-        setError({ error });
-    }
 
     const render = () => {
         if(session && session.loading) {

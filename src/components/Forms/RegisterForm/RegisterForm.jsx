@@ -54,10 +54,10 @@ const RegisterForm = ({onSubmit, isLoading, error}) => {
 
     // input data validation
     const [emailError, setEmailError] = React.useState( false );
-    const [firstNameError, setFirstNameError] = React.useState( false );
-    const [lastNameError, setLastNameError] = React.useState( false );
-    const [passwordError, setPasswordError] = React.useState( false );
-    const [repeatPasswordError, setRepeatPasswordError] = React.useState( false );
+    const [, setFirstNameError] = React.useState( false );
+    const [, setLastNameError] = React.useState( false );
+    const [, setPasswordError] = React.useState( false );
+    const [, setRepeatPasswordError] = React.useState( false );
 
 
     const onChangeEmail = (value, error) => {

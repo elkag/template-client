@@ -9,7 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { getAuthorItemsApi } from '../../api/services/getAuthorItemsApi';
 import { approveItemsApi } from '../../api/services/approveItemsApi';
-import { Checkbox, IconButton, TablePagination, TableSortLabel, Toolbar, Tooltip, Typography, withStyles } from '@material-ui/core';
+import { Checkbox, IconButton, TablePagination, TableSortLabel, Toolbar, Tooltip, Typography } from '@material-ui/core';
 import { EDIT_ITEM_PAGE, VIEW_ITEM_PAGE } from '../../config/routes';
 import { useHistory } from 'react-router-dom';
 import { Edit } from '@material-ui/icons';
@@ -99,8 +99,8 @@ export default function BasicTable() {
     const [orderBy, setOrderBy] = React.useState("date");
     const [order, setOrder] = React.useState("desc");
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(7);
-    const [dialogOpen, setIsDialogOpen] = React.useState(false); 
+    const [rowsPerPage] = React.useState(7);
+    const [, setIsDialogOpen] = React.useState(false); 
     const [approveCandidates, setApproveCandidates] = React.useState([]);
     const [totalItems, setTotalItems] = React.useState(0);
 
@@ -145,8 +145,9 @@ export default function BasicTable() {
     const response = await approveItemsApi.approve(requestData);
 
     setLoading(false);
+    var i=0
     if(response.errors || response.error) {
-      for(var i=0; i<rows.length; i++) {
+      for(i=0; i<rows.length; i++) {
         rows[i].forEach(element => {
           element.result.forEach(item => {
             item.approved.current = item.approved.original;
@@ -159,7 +160,7 @@ export default function BasicTable() {
       response.errors ? setError("Unexpected error. Please, try again later.") : setError("Server error. Please, try again later.");
 
     } else {
-      for(var i=0; i<rows.length; i++) {
+      for(i; i<rows.length; i++) {
         rows[i].forEach(element => {
           element.result.forEach(item => {
             item.approved.original = item.approved.current;
@@ -182,14 +183,6 @@ export default function BasicTable() {
     }
     setRows([]);
   }
-
-  React.useEffect( () => {
-    getPageData(false);
-  },[page, rows]);
-
-  React.useEffect( () => {
-    getPageData(true);
-  },[orderBy, order]);
 
   const getPageData = async () => {
     let response;
@@ -232,6 +225,16 @@ export default function BasicTable() {
     };
   } 
   
+  React.useEffect( () => {
+    const fetchData = getPageData;
+    fetchData(false);
+  },[page, rows]);
+
+  React.useEffect( () => {
+    const fetchData = getPageData;
+    fetchData(false);
+  },[orderBy, order]);
+
   const getCurrentDataForItem = (newItem) => {
     let rowsClone = [...rows];
     let isApproved = Object.assign({}, newItem).approved
@@ -259,20 +262,6 @@ export default function BasicTable() {
     return (user.user.username === item.user.username)
   }
 
-  const getOrderByValue = (obj) => {
-    if(orderBy === null) {
-      return;
-    }
-    if(orderBy === "user") {
-      return obj[orderBy].firstName.toString().toLowerCase() + " " + obj[orderBy].lastName.toString().toLowerCase();
-    }
-
-    if(obj[orderBy] === null) {
-      return "";
-    }
-    return obj[orderBy].toString().toLowerCase()
-  }
-
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -286,7 +275,6 @@ export default function BasicTable() {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  const emptyRows = page > 0 ? rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage) : 0;
   
   const renderTableContent = () => {
     const data = rows[page] && rows[page].filter(result => result.criteria === orderBy && result.direction === order);

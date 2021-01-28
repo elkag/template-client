@@ -60,7 +60,7 @@ export default function ApproveItemsDialog({data, onConfirm, disabled}) {
   };
   
   const handleConfirm = async () => {
-    const dataSent = await onConfirm();
+    await onConfirm();
     handleClose();
   };
   return (

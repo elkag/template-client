@@ -1,7 +1,7 @@
 import React from 'react';
 // Configuration
 import { HOME_PAGE, ABOUT_PAGE } from '../../config/routes';
-import { setSessionCookie, deleteSessionCookie } from '../../config/session';
+import { setSessionCookie } from '../../config/session';
 import { UserContext } from '../../contexts/userContext';
 
 // API
@@ -36,17 +36,6 @@ const RegisterPage = (props) => {
 
     // if there is some error from the server side
     const [error, setError] = React.useState( true );
-
-    const logIn = async (loginUsername, loginPassword) => {
-        const sessionDetails = await loginApi.logIn(loginUsername, loginPassword);
-        if(sessionDetails.error) {
-            setError(sessionDetails.message)
-        } else {
-            setSession( {user: sessionDetails.user} );
-            setSessionCookie(sessionDetails);
-            props.history.push(HOME_PAGE);
-        }
-      }
 
     /**
      * Sends requested data to BE

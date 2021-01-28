@@ -16,7 +16,6 @@ import { HOME_PAGE,
         ADMIN_PAGE,
         EDIT_ITEM_PAGE,
         VIEW_ITEMS_PAGE,
-        VIEW_ADMIN_ITEMS_PAGE,
         VIEW_ITEM_PAGE,
         VIEW_AUTHORS_PAGE,
         VIEW_ADMINS_PAGE,
@@ -27,7 +26,6 @@ import { UserSessionProvider } from '../../contexts/userContext';
 import AdminPage from '../../pages/Admin/AddItemPage';
 import ItemsListPage from '../../pages/Admin/ItemsListPage';
 import EditItemPage from '../../pages/Admin/EditItemPage';
-import AdminItemsListPage from '../../pages/Admin/AdminItemsListPage';
 import ViewItemPage from '../../pages/Admin/ViewItemPage';
 import AuthorsListPage from '../../pages/Admin/AuthorsListPage';
 import { outerTheme } from '../../styles/outerThemeProvider';
@@ -56,7 +54,6 @@ const Navigation = () => {
                         <Route path={HOME_PAGE} exact component={HomePage}/>
                         <Route path={ADMIN_PAGE} exact component={AdminPage}/>
                         <Route path={VIEW_ITEMS_PAGE} exact component={ItemsListPage}/>
-                        <Route path={VIEW_ADMIN_ITEMS_PAGE} exact component={AdminItemsListPage}/>
                         <Route path={EDIT_ITEM_PAGE.concat(":item").concat("/").concat(":page")} exact component={EditItemPage}/>
                         <Route path={VIEW_ITEM_PAGE.concat(":item").concat("/").concat(":page")} exact component={ViewItemPage}/>
                         <Route path={VIEW_AUTHORS_PAGE} exact component={AuthorsListPage}/>

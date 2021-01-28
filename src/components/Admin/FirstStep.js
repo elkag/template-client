@@ -1,6 +1,5 @@
-import React, { Fragment } from 'react';
-// context
-import { UserContext } from '../../contexts/userContext';
+import React from 'react';
+
 //components
 
 import { makeStyles, TextField } from '@material-ui/core';
@@ -55,16 +54,9 @@ const FirstStep = ({
                     handleComplete,
                     allDisabled}) => {
   
-    const [session] = React.useContext(UserContext);
-    const [item, setItem] = React.useState(null);
-    const [error, setError] = React.useState('');
     
     const classes = useStyles(makeStyles);
     
-    const handleError = (error) => {
-        setError({ error });
-    }
-
     const changeTitle = (e) => {
         handleComplete(checkComplete({title: e.target.value, link: link, description: description, text: text}));
         onChangeTitle(e.target.value);
@@ -86,7 +78,7 @@ const FirstStep = ({
     }
 
     const checkComplete = (obj) => {
-        if(obj.title !== "" && obj.link !== "" && obj.description != "" && obj.text !== "") {
+        if(obj.title !== "" && obj.link !== "" && obj.description !== "" && obj.text !== "") {
             return true;
         } else {
             return false;
