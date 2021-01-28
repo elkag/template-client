@@ -1,0 +1,9 @@
+export const mainGreen = '#008080';
+export const textsGreen = '#008080';
+export const textsRed = '#ff3300';
+export const buttonOrange = '#ff9900';
+export const textsGrey = 'rgba(0, 0, 0, 0.9)';
+export const disabledGrey = 'rgba(0, 0, 0, 0.3)';
+export const buttonRed = 'b32400';
+export const bgColor = 'rgba(0, 128, 128, 0.1)';
+export const linkColor = '#006666';

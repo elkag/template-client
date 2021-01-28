@@ -1,0 +1,15 @@
+/* -- Login Styles --*/
+
+.header-list-item a:hover {
+    color: rgb(215, 232, 250);
+    text-decoration: underline;
+    padding-left: 10px;
+    padding-right: 10px;;
+    }
+      
+.header-list-item a {
+        text-decoration: none;
+        color: rgb(240, 244, 248);
+        padding-left: 10px;
+        padding-right: 10px;;
+    }
