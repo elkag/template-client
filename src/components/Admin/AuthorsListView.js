@@ -130,7 +130,7 @@ export default function BasicTable() {
 
     const result = authors[page] && authors[page].filter(result => result.criteria === orderBy && result.direction === order);
 
-    if(!result || result.length === 0) {
+    if(!result || result.length === 0  || result[0].fake === true) {
       setLoading(true);
       response = await getAuthorsApi.get(page, rowsPerPage, orderBy, order);
       
@@ -150,17 +150,21 @@ export default function BasicTable() {
               username: user.username, 
               roles: user.roles,
               isAdmin: user.roles.some(role => role === "ADMIN"),
-              banned: user.banned
+              banned: user.banned,
+              fake: false
              }});
 
           let rowsClone = [...authors];
           if(!authors[page]) {
             rowsClone[page] = [{criteria: orderBy, direction: order, totalPages: response.totalPages, totalElements: response.totalElements, result: mapped}];
           } else {
-            rowsClone[page] = [...rowsClone[page], {criteria: orderBy, direction: order, totalPages: response.totalPages, totalElements: response.totalElements, result: Object.assign(mapped)}];
-          }
+              const cloneWithoutCache = rowsClone[page].filter(result => result.fake !== true);
+              rowsClone[page] = cloneWithoutCache;
+              rowsClone[page] = [...rowsClone[page], {criteria: orderBy, direction: order, totalPages: response.totalPages, totalElements: response.totalElements, result: Object.assign(mapped)}];
+            }
           setTotalItems(response.totalElements);
           setAuthors(rowsClone);
+
         }
     } else {
       setTotalItems(result[0].totalElements);
@@ -180,6 +184,13 @@ export default function BasicTable() {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+    const currentPage = authors[page].filter(result => result.criteria === orderBy && result.direction === order)
+    const nextPage = authors[page].filter(result => result.criteria === property && result.direction === (isAsc ? 'desc' : 'asc'))
+    if(!nextPage.length){
+      let rowsClone = [...authors];
+      rowsClone[page] = [...rowsClone[page], {criteria: property, direction: isAsc ? 'desc' : 'asc', totalPages: currentPage[0].totalPages, totalElements: currentPage[0].totalPages, result: currentPage[0].result, fake:true}];
+      setAuthors(rowsClone);
+    }
   };
 
   const createSortHandler = (property) => async (event) => {

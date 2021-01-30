@@ -201,7 +201,6 @@ export default function HorizontalNonLinearStepper() {
             if(value) {
                 i++;
             }
-            console.log(`${key}: ${value}`);
           }
           return i;
     };

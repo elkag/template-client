@@ -131,7 +131,7 @@ const handleBan = async (row) => {
 
     const result = admins[page] && admins[page].filter(result => result.criteria === orderBy && result.direction === order);
 
-    if(!result || result.length === 0) {
+    if(!result || result.length === 0  || result[0].fake === true) {
       setLoading(true);
       response = await getAdminsApi.get(page, rowsPerPage, orderBy, order);
       
@@ -151,17 +151,20 @@ const handleBan = async (row) => {
               username: user.username,
               roles: user.roles,
               isAdmin: user.roles.some(role => role === "ADMIN"),
-              banned: user.banned
+              banned: user.banned,
+              fake: false
              }});
 
-          let rowsClone = [...admins];
-          if(!admins[page]) {
-            rowsClone[page] = [{criteria: orderBy, direction: order, totalPages: response.totalPages, totalElements: response.totalElements, result: mapped}];
-          } else {
-            rowsClone[page] = [...rowsClone[page], {criteria: orderBy, direction: order, totalPages: response.totalPages, totalElements: response.totalElements, result: Object.assign(mapped)}];
-          }
-          setTotalItems(response.totalElements);
-          setAdmins(rowsClone);
+            let rowsClone = [...admins];
+            if(!admins[page]) {
+              rowsClone[page] = [{criteria: orderBy, direction: order, totalPages: response.totalPages, totalElements: response.totalElements, result: mapped}];
+            } else {
+              const cloneWithoutCache = rowsClone[page].filter(result => result.fake !== true);
+              rowsClone[page] = cloneWithoutCache;
+              rowsClone[page] = [...rowsClone[page], {criteria: orderBy, direction: order, totalPages: response.totalPages, totalElements: response.totalElements, result: Object.assign(mapped)}];
+            }
+            setTotalItems(response.totalElements);
+            setAdmins(rowsClone);
         }
     } else {
       setTotalItems(result[0].totalElements);
@@ -177,9 +180,17 @@ const handleBan = async (row) => {
   }
 
   const handleRequestSort = (event, property) => {
+
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+    const currentPage = admins[page].filter(result => result.criteria === orderBy && result.direction === order)
+    const nextPage = admins[page].filter(result => result.criteria === property && result.direction === (isAsc ? 'desc' : 'asc'))
+    if(!nextPage.length){
+      let rowsClone = [...admins];
+      rowsClone[page] = [...rowsClone[page], {criteria: property, direction: isAsc ? 'desc' : 'asc', totalPages: currentPage[0].totalPages, totalElements: currentPage[0].totalPages, result: currentPage[0].result, fake:true}];
+      setAdmins(rowsClone);
+    }
   };
 
   const createSortHandler = (property) => async (event) => {

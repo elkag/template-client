@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import { UserContext } from '../../contexts/userContext';
-import { forDevelopersApi } from '../../api/services/forDevelopersApi';
+import { API_DOCUMENTATION_URL } from '../../api/services/config/config';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -20,15 +20,11 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center'
     }
   }));
-  
-const openApiDocs = async (event) => {
-    event.preventDefault();
-    const response = forDevelopersApi.go();
-    console.log(response)
-}
+
 const Footer = () => {
 
     const classes = useStyles();
+
     const [session] = useContext(UserContext);
    
     return (
@@ -37,7 +33,7 @@ const Footer = () => {
                 session && session.user ? 
                     <Typography className={classes.root} variant="subtitle2">
                         Copyright © 2021, <b>Template Project.</b> All Rights Reserved.&nbsp;|&nbsp; 
-                        <Link href="#" onClick={openApiDocs} variant="caption" gutterBottom>
+                        <Link href={API_DOCUMENTATION_URL} variant="caption" gutterBottom>
                             For developers
                         </Link>
                     </Typography>
