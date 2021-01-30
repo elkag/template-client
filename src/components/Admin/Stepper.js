@@ -197,7 +197,7 @@ export default function HorizontalNonLinearStepper() {
 
     const completedSteps = () => {
         let i = 0;
-        for (const [key, value] of Object.entries(completed)) {
+        for (const [, value] of Object.entries(completed)) {
             if(value) {
                 i++;
             }
