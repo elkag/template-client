@@ -83,7 +83,7 @@ export default function BanUserDialog({data, onConfirm, disabled}) {
         </DialogTitle>
         <DialogContent dividers>
           {
-            data.banned ? `Do you really want to ban user ${data.username}.` : `Do you really want to unban user ${data.username}.`
+            data.banned ? `Do you really want to unban user ${data.username}.` : `Do you really want to ban user ${data.username}.`
           }
         </DialogContent>
         <DialogActions>
