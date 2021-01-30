@@ -2,7 +2,6 @@ import { Button, CircularProgress, makeStyles, Typography, withStyles } from "@m
 import React from "react";
 import DeleteIcon from '@material-ui/icons/Delete';
 import { imageUploadApi } from "../../../api/services/imageUploadApi";
-import { UserContext } from "../../../contexts/userContext";
 import Loader from "../../common/Loader";
 import { red } from "@material-ui/core/colors";
 
@@ -72,35 +71,28 @@ const useStyles = makeStyles(theme => ({
 }));
 
 // Rendering individual images
-const Image = ({ image, item, setUpdated }) => {
+const Image = ({ image, item, setImageUpdated }) => {
     const classes = useStyles(makeStyles);
-    const [uploadInitialized, setUploadInitialized] = React.useState(false);
     const [, setError] = React.useState(false);
 
-    React.useEffect(async () => {
+    React.useEffect(() => {
         async function fetchData() {
-            if(image.uploading && !uploadInitialized) {
-                setUploadInitialized(true);
-                const response = await uploadImage(image);
-                setUpdated({index: image.index, src: response.url, publicId: response.publicId, uploading: false, uploaded: true});
+            if(image.uploading) {
+                //setUploadInitialized(true);
+                const response = await imageUploadApi.upload(image, item);
+                //setUploadInitialized(false);
+                if(response.error){
+                    image.error = response.message;
+                    setImageUpdated({index: image.index, src: image.src, publicId: null, uploading: false, uploaded: true});;
+                    setError(true);
+                } else {
+                    setImageUpdated({index: image.index, src: response.url, publicId: response.publicId, uploading: false, uploaded: true});;
+                }
             }
         }
         fetchData();
-    },[image.uploading]);
-
-    const uploadImage = async (image) => {
-      
-        const response = await imageUploadApi.upload(image, item);
-       
-        if(response.error){
-            image.error = response.message;
-            setError(true);
-        } else{
-            return response;
-        }
-        return image.src;
-    }
-
+    },[image.uploading, image, item, setImageUpdated]);
+        
     return (
         <div className={(image.uploading) ? classes.imgContainerDisabled : classes.imgContainerEnabled} >
             <img className={classes.img} alt={`img - ${image.index}`} src={image.src} />
@@ -118,7 +110,7 @@ const StyledCircularProgress = withStyles({
   })(CircularProgress);
 
 // ImageList Component
-const ImageList = ({ images, setImages, setUpdated, item, disabled }) => {
+const ImageList = ({ images, setImages, setImageUpdated, item, disabled }) => {
 
     const [loading, setLoading] = React.useState(false);
 
@@ -129,13 +121,13 @@ const ImageList = ({ images, setImages, setUpdated, item, disabled }) => {
     }
 
     // render each image by calling Image component
-    const renderImage = (image, setUpdated, item) => {
+    const renderImage = (image, setImageUpdated, item) => {
         return (
                 <div className={classes.container}>
                     <Loader loading={loading} />  
                     <Image
                         image={image}
-                        setUpdated={setUpdated}
+                        setImageUpdated={setImageUpdated}
                         item={item}
                         key={`${image.id}-image`}
                         setLoading={setLoading}
@@ -161,7 +153,7 @@ const ImageList = ({ images, setImages, setUpdated, item, disabled }) => {
     // Return the list of files
     return <section className="file-list">
             <div className={classes.wrapper}>
-                {images.map(img => renderImage(img, setUpdated, item))}
+                {images.map(img => renderImage(img, setImageUpdated, item))}
             </div>
         </section>;
 };

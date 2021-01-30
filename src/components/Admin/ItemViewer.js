@@ -103,14 +103,14 @@ export default function ItemViewer() {
             setOwner(response.user)
             
         }
-      }, [params.item])
+      }, [params.item, user.user.roles])
     
       React.useEffect( () => {
           if(params.item){
               getItem();
           }
         
-      },[getItem])
+      },[getItem, params.item])
 
     const  getStepContent = (step) => {
         switch (step) {

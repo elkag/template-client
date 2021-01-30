@@ -13,7 +13,7 @@ const useStyles = makeStyles( theme => ({
     }
 }));
 
-const ThirdStep = ({images, setImages, setUpdated, item, allDisabled}) => {
+const ThirdStep = ({images, setImages, setImageUpdated, item, allDisabled}) => {
     
     const classes = useStyles(makeStyles);
 
@@ -48,7 +48,7 @@ const ThirdStep = ({images, setImages, setUpdated, item, allDisabled}) => {
             <div className={classes.dropzone}>
                 <Dropzone onDrop={onDrop} accept={"image/*"} disabled={allDisabled} />
             </div>
-            <ImageList images={images} setImages={setImages} setUpdated={setUpdated} item={item} disabled={allDisabled}/>
+            <ImageList images={images} setImages={setImages} setImageUpdated={setImageUpdated} item={item} disabled={allDisabled}/>
         </div>
     )
 }

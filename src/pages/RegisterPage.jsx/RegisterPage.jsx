@@ -1,12 +1,10 @@
 import React from 'react';
 // Configuration
-import { HOME_PAGE, ABOUT_PAGE } from '../../config/routes';
-import { setSessionCookie } from '../../config/session';
+import { ABOUT_PAGE } from '../../config/routes';
 import { UserContext } from '../../contexts/userContext';
 
 // API
 import { registerApi } from '../../api/services/registerApi';
-import { loginApi } from '../../api/services/loginApi';
 
 // Components
 import RegisterForm from '../../components/Forms/RegisterForm/RegisterForm';

@@ -1,6 +1,4 @@
 import React from 'react';
-// context
-import { UserContext } from '../../contexts/userContext';
 //components
 
 import { makeStyles, Paper } from '@material-ui/core';
@@ -36,14 +34,7 @@ const useStyles = makeStyles(theme => ({
 
 const ReviewItemView = ({item, page}) => {
   
-    const [session] = React.useContext(UserContext);
-    const [error, setError] = React.useState('');
-    
     const classes = useStyles(makeStyles);
-
-    const handleError = (error) => {
-        setError({ error });
-    }
 
     return (
       <div className={classes.pageWrapper}>

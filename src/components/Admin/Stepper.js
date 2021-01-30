@@ -67,8 +67,8 @@ export default function HorizontalNonLinearStepper() {
     const [tags, setTags] = React.useState([]);
     const [categories, setCategories] = React.useState([]);
     const [images, setImages] = React.useState([]);
-    const [, setUploading] = React.useState(false);
-    const [updated, setUpdated] = React.useState(false);
+    const [uploading, setUploading] = React.useState(false);
+    const [imageUpdated, setImageUpdated] = React.useState(null);
     const [itemId, setItemId] = React.useState(null);
     const [, setUploadButtonDisabled] = React.useState(false);
 
@@ -77,6 +77,17 @@ export default function HorizontalNonLinearStepper() {
     const [data, setData] = React.useState({});
 
     const steps = getSteps();
+
+    
+    const handleComplete = React.useCallback( (isCompleted) => {
+        const newCompleted = completed;
+        newCompleted[activeStep] = isCompleted;
+        setCompleted(newCompleted);
+    }, [activeStep, completed]);
+
+    const handleUploadDisabled = React.useCallback( () => {
+        return  !(images.filter(img => !img.uploaded).length > 0) || images.filter(img => img.uploading).length > 0
+    }, [images]);
 
     const getItem = React.useCallback(async () => {
         async function fetchItem() {}
@@ -106,7 +117,7 @@ export default function HorizontalNonLinearStepper() {
                 setData(response);
             }
             fetchItem();
-      }, [params.item])
+      }, [params.item, completed])
     
       React.useEffect( () => {
           const getItm = () => {
@@ -116,31 +127,36 @@ export default function HorizontalNonLinearStepper() {
           }
           getItm();
         
-      },[getItem])
+      },[getItem, params.item])
 
     React.useEffect(() => {
-        const fetchAfterUpload = () => {
+        const updateAfterUpload = () => {
+            if(!imageUpdated){
+                return;
+            }
             const imagesCopy = ([...images].map(object => {
-                if(object.index === updated.index) {
+                if(object.index === imageUpdated.index) {
                     return {
                         ...object,
-                        src: updated.src,
-                        publicId: updated.publicId,
-                        uploading: updated.uploading,
-                        uploaded: updated.uploaded
+                        src: imageUpdated.src,
+                        publicId: imageUpdated.publicId,
+                        uploading: imageUpdated.uploading,
+                        uploaded: imageUpdated.uploaded
                     }
                 }
                 else return object;                 
             }));
             const notUploaded = [...imagesCopy].filter(img => img.uploaded !== true);
             if(imagesCopy.length > 0 && notUploaded.length === 0) {
+                setUploading(false);
                 handleComplete(true);
             }
             setUploadButtonDisabled(handleUploadDisabled());
             setImages(imagesCopy);
+            setImageUpdated(null);
         }
-        fetchAfterUpload();
-    },[updated]);
+        if(imageUpdated) updateAfterUpload();
+    }, [imageUpdated, images,  handleComplete, handleUploadDisabled, uploading]); 
 
     const  getStepContent = (step) => {
         switch (step) {
@@ -166,7 +182,7 @@ export default function HorizontalNonLinearStepper() {
                 return <ThirdStep 
                             images={images}
                             setImages={setImages}
-                            setUpdated={setUpdated}
+                            setImageUpdated={setImageUpdated}
                             uploading={loading}
                             item={itemId}
                             handleComplete={handleComplete} />;
@@ -216,12 +232,6 @@ export default function HorizontalNonLinearStepper() {
         setActiveStep(step);
     };
 
-    const handleComplete = (isCompleted) => {
-        const newCompleted = completed;
-        newCompleted[activeStep] = isCompleted;
-        setCompleted(newCompleted);
-    };
-
     const handleDataUpdated = () => {
         return          data.name !== title
                          || data.description !== description 
@@ -232,9 +242,6 @@ export default function HorizontalNonLinearStepper() {
                          || data.images.length !== images.filter(img => img.uploaded && (img.error ? img.error === "" : true)).length
     };
 
-    const handleUploadDisabled = () => {
-        return  !(images.filter(img => !img.uploaded).length > 0) || images.filter(img => img.uploading).length > 0
-    };
 
     const handleFinish = async () => {
         setLoading(true);
@@ -259,21 +266,23 @@ export default function HorizontalNonLinearStepper() {
     };
 
     const startUpload = async () => {
-        setUploading(true)
-
+        
+        setUploadButtonDisabled(true);
         if(!itemId || itemId === undefined) {
             const response = await createNewItemApi.create();
 
             if(response.error){
-                setError(response.errorMessage)
+                setError(response.errorMessage);
+                
             } else{
                 setItemId(response)
                 uploadImages(response);
+                
             }
+            setUploading(true);
         } else {
             uploadImages(itemId);
         }
-        
     }
 
     const uploadImages = (itemId) => {
@@ -283,7 +292,7 @@ export default function HorizontalNonLinearStepper() {
             return {
             ...object,
             uploading: !object.uploaded,
-            tags: [itemId, user.username]
+            tags: [itemId, user.user.username]
             }              
         }));
         setImages(imagesCopy);

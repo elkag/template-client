@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -146,50 +146,84 @@ export default function BasicTable() {
 
     setLoading(false);
     var i=0
-    if(response.errors || response.error) {
-      for(i=0; i<rows.length; i++) {
-        rows[i].forEach(element => {
-          element.result.forEach(item => {
-            item.approved.current = item.approved.original;
-            return item;
+    if(response.items && response.items.length > 0) {
+        for(i=0; i<rows.length; i++) {
+          rows[i].forEach(element => {
+            element.result.forEach(item => {
+              const inResponse = response.items.filter(responseItem => responseItem.id === item.id);
+              const serverItem = inResponse.length ? inResponse[0] : null;
+              if(serverItem) {
+                item.approved.original = item.approved.current = serverItem.approved;
+              } else {
+                item.approved.current = item.approved.original;
+              }
+              return item;
+            })
           })
-        })
+        }
+      } else {
+        for(i=0; i<rows.length; i++) {
+          rows[i].forEach(element => {
+            element.result.forEach(item => {
+              item.approved.current = item.approved.original;
+              return item;
+            })
+          })
+        }
       }
       
-      setApproveCandidates([]);
-      response.errors ? setError("Unexpected error. Please, try again later.") : setError("Server error. Please, try again later.");
-
+    if(response.error) {
+      setError(response.message);
     } else {
-      for(i; i<rows.length; i++) {
-        rows[i].forEach(element => {
-          element.result.forEach(item => {
-            item.approved.original = item.approved.current;
-            return item;
-          })
-        })
-      }
-      setApproveCandidates([]);
-      setError("")
+      setError("");
     }
+      
+    setApproveCandidates([]);
   };
 
   const handleDelete = async (row) => {
     setLoading(true);
     const response = await deleteItemApi.delete(row.id);
     setLoading(false);
-    if(response.error || response.errors) {
-      setError("Unexpected error. Please, try again later.");
+    if(response.error) {
+      setError(response.message);
       return;
     }
-    setRows([]);
+
+    const currentPage = rows[page];
+    
+    let rowsClone = [...rows].filter(result => result.criteria === orderBy && result.direction === order);
+    
+    if(rowsClone[page]){
+      rowsClone[page] = [...rowsClone[page], {criteria: currentPage[0].criteria, direction: currentPage[0].direction, totalPages: currentPage[0].totalPages, totalElements: currentPage[0].totalPages, result: currentPage[0].result, fake:true}];
+    } else {
+      rowsClone[page] = [{criteria: currentPage[0].criteria, direction: currentPage[0].direction, totalPages: currentPage[0].totalPages, totalElements: currentPage[0].totalPages, result: currentPage[0].result, fake:true}]
+    }
+    setRows(rowsClone);
+    
   }
 
-  const getPageData = async () => {
+  
+  const getCurrentDataForItem = React.useCallback((newItem) => {
+    let rowsClone = [...rows];
+    let isApproved = Object.assign({}, newItem).approved
+    for(var row=0; row<rowsClone.length; row++) {
+        for(var element=0; element<rowsClone[row].length; element++) {
+          if(rowsClone[row][element].id === newItem.id) {
+            isApproved = rowsClone[row][element].approved.current;
+          }
+        
+      }
+    }
+    return isApproved;
+  },[rows]);
+
+  const getPageData = useCallback(async () => {
     let response;
 
     const result = rows[page] && rows[page].filter(result => result.criteria === orderBy && result.direction === order);
 
-    if(!result || result.length === 0) {
+    if(!result || result.length === 0 || result[0].fake === true) {
       setLoading(true);
       response = (user.user.roles.some(role => role === "SUPER_ADMIN")) ? await getAllItemsApi.get(page, rowsPerPage, orderBy, order) : await getAuthorItemsApi.get(page, rowsPerPage, orderBy, order);
       
@@ -208,12 +242,15 @@ export default function BasicTable() {
               name: item.name, 
               description: item.description ? (item.description.length > 200 ? item.description.substring(0, 200) + "..." : item.description) : null, 
               approved: {original: item.approved, current: getCurrentDataForItem(item)},
-              user: item.user}});
+              user: item.user,
+              fake: false}});
 
           let rowsClone = [...rows];
           if(!rows[page]) {
             rowsClone[page] = [{criteria: orderBy, direction: order, totalPages: response.totalPages, totalElements: response.totalElements, result: mapped}];
           } else {
+            const cloneWithoutCache = rowsClone[page].filter(result => result.fake !== true);
+            rowsClone[page] = cloneWithoutCache;
             rowsClone[page] = [...rowsClone[page], {criteria: orderBy, direction: order, totalPages: response.totalPages, totalElements: response.totalElements, result: Object.assign(mapped)}];
           }
           setTotalItems(response.totalElements);
@@ -223,32 +260,11 @@ export default function BasicTable() {
       setTotalItems(result[0].totalElements);
       //response = result;
     };
-  } 
+  }, [page, rows, orderBy, order, rowsPerPage, setRows, user.user.roles, getCurrentDataForItem]); 
   
   React.useEffect( () => {
-    const fetchData = getPageData;
-    fetchData(false);
-  },[page, rows]);
-
-  React.useEffect( () => {
-    const fetchData = getPageData;
-    fetchData(false);
-  },[orderBy, order]);
-
-  const getCurrentDataForItem = (newItem) => {
-    let rowsClone = [...rows];
-    let isApproved = Object.assign({}, newItem).approved
-    for(var i=0; i<rowsClone.length; i++) {
-      rowsClone[i].forEach(element => {
-        element.result.forEach(item => {
-          if(item.id === newItem.id) {
-            isApproved = item.approved.current;
-          }
-        })
-      })
-    }
-    return isApproved;
-  }
+    getPageData();
+  },[getPageData]);
 
   const isAdmin = () => {
     return user.user.roles.some(role => role === "ADMIN")
@@ -266,6 +282,13 @@ export default function BasicTable() {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+    const currentPage = rows[page].filter(result => result.criteria === orderBy && result.direction === order)
+    const nextPage = rows[page].filter(result => result.criteria === property && result.direction === (isAsc ? 'desc' : 'asc'))
+    if(!nextPage.length){
+      let rowsClone = [...rows];
+      rowsClone[page] = [...rowsClone[page], {criteria: property, direction: isAsc ? 'desc' : 'asc', totalPages: currentPage[0].totalPages, totalElements: currentPage[0].totalPages, result: currentPage[0].result, fake:true}];
+      setRows(rowsClone);
+    }
   };
 
   const createSortHandler = (property) => async (event) => {
@@ -339,7 +362,6 @@ export default function BasicTable() {
       <TableContainer component={Paper} className={classes.paper}>
         <Table 
             className={classes.table} 
-            aria-label="simple table"
             aria-labelledby="tableTitle"
             size='medium'
             aria-label="enhanced table">

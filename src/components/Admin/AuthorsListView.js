@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -125,7 +125,7 @@ export default function BasicTable() {
     }
   }
 
-  const getPageData = async () => {
+  const getPageData = useCallback(async () => {
     let response;
 
     const result = authors[page] && authors[page].filter(result => result.criteria === orderBy && result.direction === order);
@@ -165,18 +165,12 @@ export default function BasicTable() {
     } else {
       setTotalItems(result[0].totalElements);
     };
-  } 
+  }, [authors, page, orderBy, order, rowsPerPage, setAuthors]); 
 
   
   React.useEffect( () => {
-    const fetchData = getPageData;
-    fetchData(false);
-  },[page, authors]);
-
-  React.useEffect( () => {
-    const fetchData = getPageData;
-    fetchData(false);
-  },[orderBy, order]);
+    getPageData();
+  },[getPageData]);
 
   const isAdmin = () => {
     return user.user.roles.some(role => role === "SUPER_ADMIN")

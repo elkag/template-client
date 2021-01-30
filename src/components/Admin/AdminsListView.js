@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -15,7 +15,6 @@ import BanUserDialog from './dialogues/BanUserDialog';
 import { demoteUsersApi } from '../../api/services/demoteUsersApi';
 import { getAdminsApi } from '../../api/services/getAdminsApi';
 import { AdminsListContext } from '../../contexts/adminsListContext';
-import { AuthorsListContext } from '../../contexts/authorsListContext';
 import { banUserApi } from '../../api/services/banUserApi';
 import { promoteUsersApi } from '../../api/services/promoteUsersApi';
 import PromoteUserDialog from './dialogues/PromoteUserDialog';
@@ -103,16 +102,18 @@ export default function BasicTable() {
       setIsDialogOpen(true)
     }
 
-  const handleBan = async (row) => {
-    setLoading(true);
-    row.banned = !row.banned
-    const response = await banUserApi.ban(row.id, row.banned);
-    setLoading(false);
-    if(response.error) {
-      setError(response.message);
-      return;
-    }
+
+
+const handleBan = async (row) => {
+  setLoading(true);
+  row.banned = !row.banned
+  const response = await banUserApi.ban(row.id, row.banned);
+  setLoading(false);
+  if(response.error) {
+    setError(response.message);
+    return;
   }
+}
 
   const handlePromote = async (row) => {
     setLoading(true);
@@ -125,7 +126,7 @@ export default function BasicTable() {
     }
   }
 
-  const getPageData = async () => {
+  const getPageData = useCallback(async () => {
     let response;
 
     const result = admins[page] && admins[page].filter(result => result.criteria === orderBy && result.direction === order);
@@ -165,17 +166,11 @@ export default function BasicTable() {
     } else {
       setTotalItems(result[0].totalElements);
     };
-  } 
+  }, [admins, page, orderBy, order, rowsPerPage, setAdmins]); 
 
   React.useEffect( () => {
-    const fetchData = getPageData;
-    fetchData(false);
-  },[page, admins, getPageData]);
-
-  React.useEffect( () => {
-    const fetchData = getPageData;
-    fetchData(true);
-  },[orderBy, order]);
+    getPageData();
+  },[ getPageData]);
 
   const isAdmin = () => {
     return user.user.roles.some(role => role === "SUPER_ADMIN")

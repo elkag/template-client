@@ -1,4 +1,5 @@
 export const API_PREFIX = 'https://guarded-plains-77454.herokuapp.com';
+//export const API_PREFIX = 'http://localhost:8080';
 
 // Users
 export const LOGIN_SERVICE_URL =  API_PREFIX + '/users/login';

@@ -45,28 +45,28 @@ const Navigation = () => {
       <UserSessionProvider>
         <ItemsListContextProvider>
           <AuthorsListContextProvider>
-          <AdminsListContextProvider>
-            <BrowserRouter>
-              <Header/>
-                <MuiThemeProvider theme={outerTheme}>
-                  <div className={styles.container}>
-                    <Switch>
-                        <Route path={HOME_PAGE} exact component={HomePage}/>
-                        <Route path={ADMIN_PAGE} exact component={AdminPage}/>
-                        <Route path={VIEW_ITEMS_PAGE} exact component={ItemsListPage}/>
-                        <Route path={EDIT_ITEM_PAGE.concat(":item").concat("/").concat(":page")} exact component={EditItemPage}/>
-                        <Route path={VIEW_ITEM_PAGE.concat(":item").concat("/").concat(":page")} exact component={ViewItemPage}/>
-                        <Route path={VIEW_AUTHORS_PAGE} exact component={AuthorsListPage}/>
-                        <Route path={VIEW_ADMINS_PAGE} exact component={AdminsListPage}/>
-                        <Route path={ABOUT_PAGE} exact component={AboutPage} />
-                        <Route path={LOGIN_PAGE} exact component={LoginPage} /> 
-                        <Route path={REGISTER_PAGE} exact component={RegisterPage} />
-                        <Route path={CHANGE_PASSWORD_PAGE} exact component={ChangePasswordPage} />
-                    </Switch>
-                  </div>
-                </MuiThemeProvider>
-                <Footer/>
-              </BrowserRouter>
+            <AdminsListContextProvider>
+              <BrowserRouter>
+                <Header/>
+                  <MuiThemeProvider theme={outerTheme}>
+                    <div className={styles.container}>
+                      <Switch>
+                          <Route path={HOME_PAGE} exact component={HomePage}/>
+                          <Route path={ADMIN_PAGE} exact component={AdminPage}/>
+                          <Route path={VIEW_ITEMS_PAGE} exact component={ItemsListPage}/>
+                          <Route path={EDIT_ITEM_PAGE.concat(":item").concat("/").concat(":page")} exact component={EditItemPage}/>
+                          <Route path={VIEW_ITEM_PAGE.concat(":item").concat("/").concat(":page")} exact component={ViewItemPage}/>
+                          <Route path={VIEW_AUTHORS_PAGE} exact component={AuthorsListPage}/>
+                          <Route path={VIEW_ADMINS_PAGE} exact component={AdminsListPage}/>
+                          <Route path={ABOUT_PAGE} exact component={AboutPage} />
+                          <Route path={LOGIN_PAGE} exact component={LoginPage} /> 
+                          <Route path={REGISTER_PAGE} exact component={RegisterPage} />
+                          <Route path={CHANGE_PASSWORD_PAGE} exact component={ChangePasswordPage} />
+                      </Switch>
+                    </div>
+                  </MuiThemeProvider>
+                  <Footer/>
+                </BrowserRouter>
               </AdminsListContextProvider>
             </AuthorsListContextProvider> 
           </ItemsListContextProvider>

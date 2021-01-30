@@ -7,7 +7,7 @@ export const approveItemsApi = {
 
         const response = await fetch(APPROVE_ITEMS_URL,
             {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + getSessionCookie()

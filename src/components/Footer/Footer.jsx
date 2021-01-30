@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import { UserContext } from '../../contexts/userContext';
-import { useHistory } from 'react-router-dom';
 import { forDevelopersApi } from '../../api/services/forDevelopersApi';
 
 

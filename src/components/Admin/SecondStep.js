@@ -1,6 +1,5 @@
 import React from 'react';
-// context
-import { UserContext } from '../../contexts/userContext';
+
 //components
 
 import { Button, Chip, makeStyles, TextField } from '@material-ui/core';
