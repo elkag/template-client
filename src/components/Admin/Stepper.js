@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function getSteps() {
-  return ['Item description', 'Add categories and tags', 'Select images'];
+  return ['Select images', 'Item description', 'Add categories and tags'];
 }
 
 export default function HorizontalNonLinearStepper() {
@@ -56,7 +56,7 @@ export default function HorizontalNonLinearStepper() {
     const [user] = React.useContext(UserContext);
 
     const [activeStep, setActiveStep] = React.useState(params.page ? Number(params.page) : 0);
-    const [completed, setCompleted] = React.useState({});
+    const [completed, setCompleted] = React.useState({0: true});
 
     const [title, setTitle] = React.useState("");
     const [link, setLink] = React.useState("");
@@ -161,6 +161,14 @@ export default function HorizontalNonLinearStepper() {
     const  getStepContent = (step) => {
         switch (step) {
             case 0:
+                return <ThirdStep 
+                            images={images}
+                            setImages={setImages}
+                            setImageUpdated={setImageUpdated}
+                            uploading={loading}
+                            item={itemId}
+                            handleComplete={handleComplete} />;
+            case 1:
                 return <FirstStep 
                             title={title} 
                             onChangeTitle={setTitle}
@@ -171,20 +179,12 @@ export default function HorizontalNonLinearStepper() {
                             text={text} 
                             onChangeText={setText}
                             handleComplete={handleComplete} />;
-            case 1:
+            case 2:
                 return <SecondStep 
                             categories={categories} setCategories={setCategories}
                             tags={tags} setTags={setTags}
                             tagsString={tagsString} onChangeTags={setTagsString}
                             categoriesString={categoriesString} onChangeCategories={setCategoriesString}
-                            handleComplete={handleComplete} />;
-            case 2:
-                return <ThirdStep 
-                            images={images}
-                            setImages={setImages}
-                            setImageUpdated={setImageUpdated}
-                            uploading={loading}
-                            item={itemId}
                             handleComplete={handleComplete} />;
           default:
             return 'Unknown step';
@@ -195,24 +195,9 @@ export default function HorizontalNonLinearStepper() {
         return steps.length;
     };
 
-    const completedSteps = () => {
-        let i = 0;
-        for (const [, value] of Object.entries(completed)) {
-            if(value) {
-                i++;
-            }
-          }
-          return i;
-    };
-
     const isLastStep = () => {
         return activeStep === totalSteps() - 1;
     };
-
-    const allStepsCompleted = () => {
-        return completedSteps() === totalSteps();
-    };
-
     const handleNext = () => {
     const newActiveStep =
         isLastStep()
@@ -232,20 +217,52 @@ export default function HorizontalNonLinearStepper() {
     };
 
     const handleDataUpdated = () => {
-        return          data.name !== title
-                         || data.description !== description 
-                         || data.link !== link 
-                         || data.notes !== text 
-                         || data.categories !== categories 
-                         || data.tags !== tags
-                         || data.images.length !== images.filter(img => img.uploaded && (img.error ? img.error === "" : true)).length
+        
+        if(!data) {
+            return true;
+        }
+        return          (data.name !== title)
+                         || (data.description !== description)
+                         || (data.link !== link) 
+                         || (data.notes !== text) 
+                         || (data.categories !== categories) 
+                         || (data.tags !== tags)
+                         || (data.images.length && data.images.length !== images.filter(img => img.uploaded && (img.error ? img.error === "" : true)).length)
     };
 
 
+    const isFormEmpty = () => {
+        if(!itemId) {
+            const t = (title === "") ? true : false;
+            const d = (description === "") ? true : false;
+            const tx = (text === "") ? true : false;
+            const l = (link === "") ? true : false;
+            const c = (categories.length === 0) ? true : false;
+            const tg = (tags.length === 0) ? true : false;
+            const isDisabled =  (t && d && tx && l && c && tg) ? true : false;
+            
+            return isDisabled;
+        } else {
+            return !handleDataUpdated();
+        }
+    }
     const handleFinish = async () => {
         setLoading(true);
+        let id = itemId;
+        if(!id) {
+            const itemIdResponse = await createNewItemApi.create();
+
+            if(itemIdResponse.error){
+                setError(itemIdResponse.errorMessage);
+                return;
+                
+            } else{
+                id = itemIdResponse;                
+            }
+        }
+
         const response = await updateItemApi.update({
-            id: itemId,
+            id: id,
             name: title,
             description: description,
             notes: text,
@@ -260,7 +277,6 @@ export default function HorizontalNonLinearStepper() {
             setError(response.message);
         } else {
             history.push(VIEW_ITEM_PAGE + `${response.id}/${activeStep}`);
-            
         }
     };
 
@@ -331,11 +347,11 @@ export default function HorizontalNonLinearStepper() {
                     className={classes.button}
                     variant="contained"
                     color="secondary" 
-                    disabled={!allStepsCompleted() || !handleDataUpdated()}
+                    disabled={isFormEmpty() && !handleDataUpdated()}
                     onClick={handleFinish}>
                     Save
                 </Button>
-                {activeStep === 2 ?
+                {activeStep === 0 ?
                 <Button
                   className={classes.button}
                     variant="contained"

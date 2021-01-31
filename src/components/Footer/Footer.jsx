@@ -33,7 +33,7 @@ const Footer = () => {
                 session && session.user ? 
                     <Typography className={classes.root} variant="subtitle2">
                         Copyright © 2021, <b>Template Project.</b> All Rights Reserved.&nbsp;|&nbsp; 
-                        <Link href={API_DOCUMENTATION_URL} variant="caption" gutterBottom>
+                        <Link href={API_DOCUMENTATION_URL} variant="caption" target="_blank" rel="noopener" gutterBottom>
                             For developers
                         </Link>
                     </Typography>
