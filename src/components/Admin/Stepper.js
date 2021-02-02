@@ -15,6 +15,7 @@ import { getItemApi } from '../../api/services/getItemApi';
 import { useHistory, useParams } from 'react-router-dom';
 import Loader from '../common/Loader';
 import { VIEW_ITEM_PAGE } from '../../config/routes';
+import UploadImagesDialog from './dialogues/UploadImagesDialog';
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -75,6 +76,7 @@ export default function HorizontalNonLinearStepper() {
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState("");
     const [data, setData] = React.useState({});
+    const [uploadImagesDialogOpen, setUploadImagesDialogOpen] = React.useState(false);
 
     const steps = getSteps();
 
@@ -218,8 +220,8 @@ export default function HorizontalNonLinearStepper() {
 
     const handleDataUpdated = () => {
         
-        if(!data) {
-            return true;
+        if(data && Object.keys(data).length === 0 && data.constructor === Object) {
+            return false;
         }
         return          (data.name !== title)
                          || (data.description !== description)
@@ -239,14 +241,18 @@ export default function HorizontalNonLinearStepper() {
             const l = (link === "") ? true : false;
             const c = (categories.length === 0) ? true : false;
             const tg = (tags.length === 0) ? true : false;
-            const isDisabled =  (t && d && tx && l && c && tg) ? true : false;
-            
-            return isDisabled;
+            return t && d && tx && l && c && tg;
         } else {
             return !handleDataUpdated();
         }
     }
     const handleFinish = async () => {
+        const unuploadedImages = images.filter(img => !img.uploaded);
+        if(unuploadedImages && unuploadedImages.length > 0) {
+            setActiveStep(0);
+            setUploadImagesDialogOpen(true);
+            return;
+        }
         setLoading(true);
         let id = itemId;
         if(!id) {
@@ -316,6 +322,9 @@ export default function HorizontalNonLinearStepper() {
     return (
         <div className={classes.root}>
         <Loader loading={loading} error={error} />
+        {
+            uploadImagesDialogOpen ? <UploadImagesDialog onDialogClose={setUploadImagesDialogOpen} dialogOpen={uploadImagesDialogOpen} /> : null
+        }
         <Stepper nonLinear activeStep={activeStep}>
             {steps.map((label, index) => (
             <Step key={label}>

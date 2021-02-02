@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function getSteps() {
-  return ['Item description', 'Add categories and tags', 'Select images'];
+    return ['Selected images', 'Item description', 'Categories and tags'];
 }
 
 export default function ItemViewer() {
@@ -115,7 +115,16 @@ export default function ItemViewer() {
     const  getStepContent = (step) => {
         switch (step) {
             case 0:
-                return <FirstStep 
+                return <ThirdStep 
+                            images={images}
+                            setImages={setImages}
+                            setUpdated={null}
+                            uploading={false}
+                            item={itemId}
+                            handleComplete={null}
+                            allDisabled={true} />;
+            case 1:
+               return <FirstStep 
                             title={title} 
                             onChangeTitle={setTitle}
                             link={link}
@@ -126,21 +135,12 @@ export default function ItemViewer() {
                             onChangeText={setText}
                             handleComplete={null} 
                             allDisabled={true}/>;
-            case 1:
-                return <SecondStep 
+            case 2:
+                 return <SecondStep 
                             categories={categories} setCategories={setCategories}
                             tags={tags} setTags={setTags}
                             tagsString={tagsString} onChangeTags={setTagsString}
                             categoriesString={categoriesString} onChangeCategories={setCategoriesString}
-                            handleComplete={null}
-                            allDisabled={true} />;
-            case 2:
-                return <ThirdStep 
-                            images={images}
-                            setImages={setImages}
-                            setUpdated={null}
-                            uploading={false}
-                            item={itemId}
                             handleComplete={null}
                             allDisabled={true} />;
           default:
