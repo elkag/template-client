@@ -74,6 +74,11 @@ const Header = () => {
         setRows([]);
     }
 
+    const isAdmin = () => {
+        const admin = session.user && session.user.roles && session.user.roles.filter(r => r === 'SUPER_ADMIN');
+        return admin && admin.length;
+    }
+
     const onAboutThisApp = () => {
         history.push(ABOUT_PAGE);
     }
@@ -111,11 +116,13 @@ const Header = () => {
             key: 'Authors',
             icon: <PersonIcon />,
             onClick: onAuthorsListView,
+            disabled: !isAdmin(),
             position: 'top'
         },{
             key: 'Administrators',
             icon: <SupervisorAccountIcon />,
             onClick: onAdminsListView,
+            disabled: !isAdmin(),
             position: 'top'
         },{
             key: 'About this app',

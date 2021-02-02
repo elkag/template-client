@@ -43,7 +43,7 @@ const LeftMenu = ({menuList}) => {
     >
       <List className={classes.list}>
         { menuList.filter(item => item.position === 'top').map(item => 
-          <ListItem button key={item.key}  onClick={item.onClick}>
+          <ListItem button key={item.key}  onClick={item.onClick} disabled={item.disabled}>
             <ListItemIcon>
               {item.icon}
             </ListItemIcon>
