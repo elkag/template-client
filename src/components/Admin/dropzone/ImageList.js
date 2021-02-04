@@ -74,7 +74,7 @@ const useStyles = makeStyles(theme => ({
 const Image = ({ image, item, setImageUpdated }) => {
     const classes = useStyles(makeStyles);
     const [, setError] = React.useState(false);
-
+    
     React.useEffect(() => {
         async function fetchData() {
             if(image.uploading) {
@@ -86,7 +86,7 @@ const Image = ({ image, item, setImageUpdated }) => {
                     setImageUpdated({index: image.index, src: image.src, publicId: null, uploading: false, uploaded: true});;
                     setError(true);
                 } else {
-                    setImageUpdated({index: image.index, src: response.url, publicId: response.publicId, uploading: false, uploaded: true});;
+                    setImageUpdated({index: image.index, id: response.id, src: response.url, publicId: response.publicId, uploading: false, uploaded: true});;
                 }
             }
         }
@@ -94,7 +94,7 @@ const Image = ({ image, item, setImageUpdated }) => {
     },[image.uploading, image, item, setImageUpdated]);
         
     return (
-        <div className={(image.uploading) ? classes.imgContainerDisabled : classes.imgContainerEnabled} >
+        <div className={(image.uploading || image.deleting) ? classes.imgContainerDisabled : classes.imgContainerEnabled} >
             <img className={classes.img} alt={`img - ${image.index}`} src={image.src} />
         </div>
     );
@@ -110,14 +110,13 @@ const StyledCircularProgress = withStyles({
   })(CircularProgress);
 
 // ImageList Component
-const ImageList = ({ images, setImages, setImageUpdated, item, disabled }) => {
+const ImageList = ({ images, deleteImage, setImageUpdated, item, disabled }) => {
 
     const [loading, setLoading] = React.useState(false);
-
     const classes = useStyles(makeStyles);
 
-    const deleteImg = (image) => {
-        setImages(images.filter(e => e !== image));
+    const deleteImg = async (image) => {
+        await deleteImage(image);
     }
 
     // render each image by calling Image component
@@ -133,14 +132,14 @@ const ImageList = ({ images, setImages, setImageUpdated, item, disabled }) => {
                         setLoading={setLoading}
                     /> 
                     <Button className={classes.delete} 
-                        disabled={(disabled || (image.uploading))} 
+                        disabled={(disabled || (image.uploading) || image.deleting)} 
                         variant="contained" 
                         onClick={() => deleteImg(image)} 
                         startIcon={<DeleteIcon />}>
                             Delete
                     </Button>
                     <Typography className={image.error? classes.error : classes.info}>{image.error || null}</Typography>
-                    {(image.uploading && !image.uploaded) ? 
+                    {(image.uploading && !image.uploaded) || image.deleting ? 
                         (<div className={classes.loaderContainer}>
                         <div className={classes.loader}>
                             <StyledCircularProgress color="primary" />

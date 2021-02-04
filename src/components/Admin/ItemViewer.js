@@ -42,11 +42,11 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'row'
     },
-    editBtn: {
-        width: '100%',
+    buttonWrapper: {
         display: 'flex',
-        justifyContent: 'flex-end',
-        marginRight: 20,
+        flexDirection: 'row',
+        padding: 20,
+        justifyContent: 'space-between'
     },
 }));
 
@@ -194,19 +194,7 @@ export default function ItemViewer() {
         <div>
             <div>
                 <Typography className={classes.container}>{getStepContent(activeStep)}</Typography>
-                <div className={classes.buttons}>
-                    <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                        Back
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleNext}
-                        disabled={activeStep === 2} 
-                        className={classes.button}
-                    >
-                        Next
-                    </Button>
+                <div className={classes.buttonWrapper}>
                     <div className={classes.editBtn}>
                         <Button
                             variant="contained"
@@ -215,6 +203,20 @@ export default function ItemViewer() {
                             disabled={!owner || owner.id !== user.user.id}>
                                 <Edit style={{width: '20px'}}/>
                                 &nbsp;Edit
+                        </Button>
+                    </div>
+                    <div>
+                        <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                            Back
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={handleNext}
+                            disabled={activeStep === 2} 
+                            className={classes.button}
+                        >
+                            Next
                         </Button>
                     </div>
                 </div>

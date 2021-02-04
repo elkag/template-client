@@ -16,10 +16,13 @@ import { useHistory, useParams } from 'react-router-dom';
 import Loader from '../common/Loader';
 import { VIEW_ITEM_PAGE } from '../../config/routes';
 import UploadImagesDialog from './dialogues/UploadImagesDialog';
+import { ItemsListContext } from '../../contexts/itemsListContext';
+import { deleteImageApi } from '../../api/services/deleteImageApi';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import CheckSharpIcon from '@material-ui/icons/CheckSharp';
 
 const useStyles = makeStyles((theme) => ({
     container: {
-        
         display: 'flex',
         flexGrow: 1,
         flexWrap: 'wrap',
@@ -31,13 +34,19 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         textAlign: 'left'
     },
-        button: {
+    buttonWrapper: {
+        display: 'flex',
+        flexDirection: 'row',
+        padding: 20,
+        justifyContent: 'space-between'
+    },
+    button: {
         marginRight: theme.spacing(1),
     },
         completed: {
         display: 'inline-block',
     },
-        instructions: {
+    instructions: {
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1),
     },
@@ -55,6 +64,7 @@ export default function HorizontalNonLinearStepper() {
     const params = useParams();
 
     const [user] = React.useContext(UserContext);
+    const [, setItems] = React.useContext(ItemsListContext);
 
     const [activeStep, setActiveStep] = React.useState(params.page ? Number(params.page) : 0);
     const [completed, setCompleted] = React.useState({0: true});
@@ -80,7 +90,27 @@ export default function HorizontalNonLinearStepper() {
 
     const steps = getSteps();
 
-    
+    const deleteImage = async (image) => {
+        
+
+        if(image.publicId && image.uploaded) { 
+            let imagesCopy = [...images];
+            imagesCopy.forEach(img => {
+                if(img.id === image.id) {
+                    img.deleting = true;
+                }
+                return img;
+            });
+            setImages(imagesCopy);
+            const response = await deleteImageApi.delete(itemId, image.id);
+            if(response.error){
+                setError(response.message);
+                return;
+            }
+        }
+        setImages(images.filter(img => img !== image));
+    }
+
     const handleComplete = React.useCallback( (isCompleted) => {
         const newCompleted = completed;
         newCompleted[activeStep] = isCompleted;
@@ -109,7 +139,7 @@ export default function HorizontalNonLinearStepper() {
                 setTags(response.tags); 
                 setCategoriesString(response.categories.join(", "));
                 setTagsString(response.tags.join(", ")); 
-                response.images = response.images.map(img => {return {id: img.id, src: img.url, publicId: img.publicId, uploaded: true, uploading: false}})
+                response.images = response.images.map(img => {return {id: img.id, src: img.url, publicId: img.publicId, uploaded: true, uploading: false, deleting: false}})
                 setImages(response.images);
                 for(let i=0; i <= 2; i++){
                     const newCompleted = completed;
@@ -142,6 +172,7 @@ export default function HorizontalNonLinearStepper() {
                         ...object,
                         src: imageUpdated.src,
                         publicId: imageUpdated.publicId,
+                        id: imageUpdated.id,
                         uploading: imageUpdated.uploading,
                         uploaded: imageUpdated.uploaded
                     }
@@ -166,6 +197,7 @@ export default function HorizontalNonLinearStepper() {
                 return <ThirdStep 
                             images={images}
                             setImages={setImages}
+                            deleteImage={deleteImage}
                             setImageUpdated={setImageUpdated}
                             uploading={loading}
                             item={itemId}
@@ -218,23 +250,35 @@ export default function HorizontalNonLinearStepper() {
         setActiveStep(step);
     };
 
-    const handleDataUpdated = () => {
+
+    const haveNewImages = (hasData) => {
         
-        if(data && Object.keys(data).length === 0 && data.constructor === Object) {
+        if(!hasData) {
             return false;
         }
-        return          (data.name !== title)
+
+        return images.filter(img =>img.error ? img.error === "" : true).length !== data.images.length;
+    }
+    const handleDataUpdated = () => {
+        
+        const hasData = !(data && Object.keys(data).length === 0 && data.constructor === Object);
+        var hasNewImages = haveNewImages(hasData);
+        
+        if(!itemId){
+            return hasNewImages;
+        }
+        return          hasNewImages || (data.name !== title)
                          || (data.description !== description)
                          || (data.link !== link) 
                          || (data.notes !== text) 
                          || (data.categories !== categories) 
                          || (data.tags !== tags)
-                         || (data.images.length && data.images.length !== images.filter(img => img.uploaded && (img.error ? img.error === "" : true)).length)
     };
 
 
     const isFormEmpty = () => {
-        if(!itemId) {
+        const itemNotSaved = data && Object.keys(data).length === 0 && data.constructor === Object;
+        if(!itemId || itemNotSaved) {
             const t = (title === "") ? true : false;
             const d = (description === "") ? true : false;
             const tx = (text === "") ? true : false;
@@ -263,7 +307,8 @@ export default function HorizontalNonLinearStepper() {
                 return;
                 
             } else{
-                id = itemIdResponse;                
+                id = itemIdResponse;   
+                setItems([]);             
             }
         }
 
@@ -338,39 +383,47 @@ export default function HorizontalNonLinearStepper() {
            
             <div>
                 <Typography className={classes.container}>{getStepContent(activeStep)}</Typography>
-                <div>
-                <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                    Back
-                </Button>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}
-                    disabled={activeStep === 2} 
-                    className={classes.button}
-                >
-                    Next
-                </Button>
-                
-                <Button
-                    className={classes.button}
-                    variant="contained"
-                    color="secondary" 
-                    disabled={isFormEmpty() && !handleDataUpdated()}
-                    onClick={handleFinish}>
-                    Save
-                </Button>
-                {activeStep === 0 ?
-                <Button
-                  className={classes.button}
-                    variant="contained"
-                    color="primary" 
-                    disabled={handleUploadDisabled()}
-                    onClick={startUpload}>
-                   Upload
-                 </Button>
-                  : null}
-                </div>
+                <div className={classes.buttonWrapper}>
+                    
+                    <div>
+                    {
+                        activeStep > 0 ? 
+                        <Button
+                            className={classes.button}
+                            variant="contained"
+                            color="secondary" 
+                            disabled={isFormEmpty() && !handleDataUpdated()}
+                            onClick={handleFinish}>
+                            <CheckSharpIcon />
+                            &nbsp;&nbsp;Save
+                        </Button>
+                        :
+                        <Button
+                            className={classes.button}
+                                variant="contained"
+                                color="secondary" 
+                                disabled={handleUploadDisabled()}
+                                onClick={startUpload}>
+                            <CloudUploadIcon />
+                            &nbsp;&nbsp;Upload
+                        </Button>
+                    }
+                    </div>
+                    <div>
+                        <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                            Back
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleNext}
+                            disabled={activeStep === 2} 
+                            className={classes.button}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                 </div>
             </div>
             
         </div>

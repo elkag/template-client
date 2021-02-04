@@ -18,6 +18,7 @@ export const BAN_USER_URL = API_PREFIX + '/users/ban';
 export const CREATE_NEW_ITEM_URL = API_PREFIX + '/items/new';
 export const UPDATE_ITEM_URL = API_PREFIX + '/items/update';
 export const UPLOAD_IMAGE_URL = API_PREFIX + '/images/upload';
+export const DELETE_IMAGE_URL = API_PREFIX + '/images/delete';
 export const GET_AUTHORS_ITEM_URL = API_PREFIX + '/items/get-author-item';
 export const GET_ITEM_URL = API_PREFIX + '/items/admin/get';
 export const GET_AUTHOR_ITEMS_URL = API_PREFIX + '/items/get-author-items';

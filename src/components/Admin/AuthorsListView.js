@@ -18,6 +18,7 @@ import { getAuthorsApi } from '../../api/services/getAuthorsApi';
 import { banUserApi } from '../../api/services/banUserApi';
 import { demoteUsersApi } from '../../api/services/demoteUsersApi';
 import PromoteUserDialog from './dialogues/PromoteUserDialog';
+import { AdminsListContext } from '../../contexts/adminsListContext';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -86,6 +87,7 @@ export default function BasicTable() {
 
     const [user] = React.useContext(UserContext);
     const [authors, setAuthors] = React.useContext(AuthorsListContext);
+    const [, setAdmins] = React.useContext(AdminsListContext);
     
     const classes = useStyles();
 
@@ -112,6 +114,9 @@ export default function BasicTable() {
       setError(response.message);
       return;
     }
+
+    setAuthors([]);
+    setAdmins([]);
   }
   
   const handleBan = async (row) => {

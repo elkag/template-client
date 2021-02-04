@@ -18,6 +18,7 @@ import { AdminsListContext } from '../../contexts/adminsListContext';
 import { banUserApi } from '../../api/services/banUserApi';
 import { promoteUsersApi } from '../../api/services/promoteUsersApi';
 import PromoteUserDialog from './dialogues/PromoteUserDialog';
+import { AuthorsListContext } from '../../contexts/authorsListContext';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -86,6 +87,7 @@ export default function BasicTable() {
 
     const [user] = React.useContext(UserContext);
     const [admins, setAdmins] = React.useContext(AdminsListContext);
+    const [, setAuthors] = React.useContext(AuthorsListContext);
     
     const classes = useStyles();
 
@@ -118,12 +120,15 @@ const handleBan = async (row) => {
   const handlePromote = async (row) => {
     setLoading(true);
     const response = row.isAdmin ? await demoteUsersApi.demote([row.id]) : await promoteUsersApi.promote([row.id]);
+    
     row.isAdmin = !row.isAdmin
     setLoading(false);
     if(response.error ) {
       setError(response.message);
       return;
     }
+    setAuthors([]);
+    setAdmins([]);
   }
 
   const getPageData = useCallback(async () => {
